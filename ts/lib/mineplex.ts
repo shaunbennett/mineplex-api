@@ -135,7 +135,7 @@ export namespace Mineplex {
      */
     private apiCall<T>(resource: string): Promise<T> {
       return new Promise<T>((resolve, reject) => {
-        request(this.buildUrl(resource), (err, response, body) => {
+        request({ url: this.buildUrl(resource), json: true }, (err, response, body) => {
           if (err || response.statusCode !== 200) {
             reject(err || new APIError(body));
             return;

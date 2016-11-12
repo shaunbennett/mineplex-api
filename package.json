@@ -1,10 +1,13 @@
 {
-  "name": "mineplex-api",
-  "version": "1.0.0",
+  "name": "mineplex",
+  "version": "0.0.4",
   "description": "Wrapper for the Mineplex API",
-  "main": "index.js",
+  "main": "js/index.js",
+  "types": "js/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -p ./ts",
+    "test": "npm run build && mocha ./js/test",
+    "install": "cd ts && typings install"
   },
   "repository": {
     "type": "git",
@@ -24,8 +27,9 @@
   },
   "homepage": "https://github.com/shaunbennett/mineplex-api#readme",
   "dependencies": {
-    "bluebird": "^3.4.6",
-    "request": "^2.78.0"
+    "bluebird": "3.4.6",
+    "request": "2.78.0",
+    "@types/bluebird": "3.0.35"
   },
   "devDependencies": {
     "chai": "^3.5.0",
