@@ -1,13 +1,13 @@
 {
   "name": "mineplex",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Wrapper for the Mineplex API",
   "main": "js/index.js",
   "types": "js/index.d.ts",
   "scripts": {
     "build": "tsc -p ./ts",
     "test": "npm run build && mocha ./js/test",
-    "install": "cd ts && typings install"
+    "typings": "cd ts && typings install"
   },
   "repository": {
     "type": "git",

@@ -20,7 +20,8 @@ You must have [typescript](https://www.typescriptlang.org), [mocha](https://moch
 > npm install -g typescript typings mocha
 
 Next we need to install the dependencies for this project. While inside of the mineplex-api directory, run
-> npm install
+> npm install  
+> npm run typings
 
 To run the tests
 > npm test
