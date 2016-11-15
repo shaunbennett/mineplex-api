@@ -1,1 +1,1 @@
-export { Mineplex } from "./lib/mineplex";
+export * from "./lib/mineplex";

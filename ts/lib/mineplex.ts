@@ -1,154 +1,96 @@
 import * as request from "request";
 import * as Promise from "bluebird";
 
-export namespace Mineplex {
+// Mineplex Libraries
+import * as player from "./player";
+import * as network from "./network";
 
-  /**
-   * Represents an error thrown by the API when statusCode is not 200
-   */
-  export class APIError implements Error {
-    name: string;
-    statusCode: number;
-    error: string;
-    message: string;
+export type Callback<T> = (err, res: T) => void;
 
-    constructor(base) {
-      this.name = base["error"];
-      this.statusCode = base["statusCode"];
-      this.error = base["error"];
-      this.message = base["message"] || base["error"];
-    }
-  }
+/**
+ * Represents an error thrown by the API when statusCode is not 200
+ */
+export class APIError implements Error {
+  name: string;
+  statusCode: number;
+  error: string;
+  message: string;
 
-  /**
-   * Represents the most basic form of a Player
-   */
-  export interface PlayerBase {
-    /**
-     * The Minecraft username of the Player
-     * @type {string}
-     */
-    name: string;
-
-    /**
-     * The UUID of the player. Represented as a String, includes dashes
-     * @type {string}
-     */
-    uuid: string;
-
-  }
-
-  /**
-   * Represents the online status of a Player
-   */
-  export interface Status {
-    /**
-     * Is the player logged on to Mineplex right now?
-     * @type {boolean}
-     */
-    online: boolean;
-
-    /**
-     * The current server the player is connected to. Only present if online
-     * is true.
-     * @type {string}
-     */
-    server?: string;
-  }
-
-  /**
-   * The level information for a player
-   */
-  export interface Level {
-    /**
-     * Current level of the player
-     * @type {number}
-     */
-    value: number;
-    /**
-     * The color for that player's level
-     * @type {string}
-     */
-    color: string;
-  }
-
-  /**
-   * Represents a Mineplex Player
-   */
-  export interface Player extends PlayerBase {
-    /**
-     * Rank of the player
-     * @type {string}
-     */
-    rank: string;
-
-    /**
-     * The last time the player logged in to Mineplex
-     * @type {Date}
-     */
-    lastLogin: Date;
-
-    /**
-     * The level of the player
-     * @type {Level}
-     */
-    level: Level;
-
-    /**
-     * Current login status of the Player
-     * @type {Status}
-     */
-    status: Status;
-
-    /**
-     * List of friends with the player
-     * @type {Array<PlayerBase>}
-     */
-    friends: Array<PlayerBase>;
-
-    /**
-     * Player stats
-     */
-    stats: {};
-  }
-
-  export class MineplexAPI {
-    private baseUrl: string;
-    private apiKey: string;
-
-    constructor(apiKey: string, baseUrl?: string) {
-      this.baseUrl = baseUrl || "https://api.mineplex.com/pc";
-      this.apiKey = apiKey;
-    }
-
-    /**
-     * Get a specific player
-     * @param  {string}          player UUID or name of the player
-     * @return {Promise<Player>}        A Promise containing the Player result
-     */
-    public getPlayer(player: string): Promise<Player> {
-      return this.apiCall<Player>(`player/${player}`);
-    }
-
-    /**
-     * Wrapper method for making an api call
-     */
-    private apiCall<T>(resource: string): Promise<T> {
-      return new Promise<T>((resolve, reject) => {
-        request({ url: this.buildUrl(resource), json: true }, (err, response, body) => {
-          if (err || response.statusCode !== 200) {
-            reject(err || new APIError(body));
-            return;
-          }
-
-          resolve(<T>body);
-        });
-      });
-    }
-
-    private buildUrl(resource: string): string {
-      return `${this.baseUrl}/${resource}?apiKey=${this.apiKey}`;
-    }
-
+  constructor(base) {
+    this.name = base["error"];
+    this.statusCode = base["statusCode"];
+    this.error = base["error"];
+    this.message = base["message"] || base["error"];
   }
 }
+
+export class MineplexAPI {
+  private baseUrl: string;
+  private apiKey: string;
+
+  constructor(apiKey: string, baseUrl?: string) {
+    this.baseUrl = baseUrl || "https://api.mineplex.com/pc";
+    this.apiKey = apiKey;
+  }
+
+  /**
+   * PLAYER ENDPOINTS !
+   */
+
+  /**
+   * Get a specific player
+   * @param  {string}          player UUID or name of the player
+   * @return {Promise<Player>}        A Promise containing the Player result
+   */
+  public getPlayer(player: string, callback?: Callback<player.Player>) {
+    return this.apiCall<player.Player>(`player/${player}`, callback);
+  }
+
+  public getPlayerStatus(player: string, callback?: Callback<player.Status>) {
+    return this.apiCall<player.Status>(`player/${player}/status`, callback);
+  }
+
+  public getPlayerFriends(player: string, callback?: Callback<Array<player.PlayerBase>>) {
+    return this.apiCall<Array<player.PlayerBase>>(`player/${player}/friends`, callback);
+  }
+
+  /**
+   * NETWORK ENDPOINTS !
+   */
+
+  public getNetworkStatus(callback?: Callback<network.NetworkStatus>) {
+    return this.apiCall<network.NetworkStatus>(`network`, callback);
+  }
+
+  public getRegionStatus(region: network.Region, callback?: Callback<network.RegionStatus>) {
+    return this.apiCall<network.RegionStatus>(`network/${region}`, callback);
+  }
+
+  public getServerStatus(region: network.Region, server: string, callback?: Callback<network.MinecraftServer>) {
+    return this.apiCall<network.MinecraftServer>(`network/${region}`, callback);
+  }
+
+  /**
+   * Wrapper method for making an api call
+   */
+  private apiCall<T>(resource: string, callback?: Callback<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      request({ url: this.buildUrl(resource), json: true }, (err, response, body) => {
+        if (err || response.statusCode !== 200) {
+          reject(err || new APIError(body));
+          return;
+        }
+
+        resolve(body);
+      });
+    }).asCallback(callback);
+  }
+
+  private buildUrl(resource: string): string {
+    return `${this.baseUrl}/${resource}?apiKey=${this.apiKey}`;
+  }
+}
+
+// Export the Mineplex libraries
+export * from "./player";
+export * from "./network";
