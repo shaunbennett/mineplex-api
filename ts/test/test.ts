@@ -18,9 +18,10 @@ describe("MineplexAPI", () => {
           player.name.should.equal("Phinary");
           player.uuid.should.equal("b33207e2-0dc5-4cbd-b3ee-6c860727f722");
           player.rank.should.be.a("string");
+          player.shards.should.be.a("number");
+          player.gems.should.be.a("number");
           player.lastLogin.should.be.a("string");
           player.level.should.include.keys(["value", "color"]);
-          player.status.should.have.property("online");
           player.friends.should.be.an.instanceof(Array);
 
           player.friends.forEach(f => {
@@ -62,12 +63,29 @@ describe("MineplexAPI", () => {
         });
       });
     });
+    describe("amplifier", () => {
+      it("getAmplifierGroups", () => {
+        return validApi.getAmplifierGroups().then(groups => {
+          groups.should.exist.and.be.an.instanceof(Array);
+        });
+      });
+      it("getAmplifiers", () => {
+        // This makes the assumption that UHC is an amplifier group
+        return validApi.getAmplifiers("UHC").then(amps => {
+          amps.should.be.an.instanceof(Array);
+          if (amps.length > 0) {
+            let amp = amps[0];
+            amp.should.exist.and.have.all.keys("playerName", "uuid", "duration",
+              "activationTime", "multiplier", "startTime", "endTime");
+          }
+        });
+      });
+    });
   });
   describe("Errors", () => {
     it("invalid api key", () => {
       let api = new MineplexAPI("poop");
-      return api.getPlayer("Phinary").should.eventually.be.rejected
-        .and.be.an.instanceof(APIError);
+      return api.getPlayer("Phinary").should.eventually.be.rejected.and.be.an.instanceof(APIError);
     });
   });
 });

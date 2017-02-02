@@ -1,6 +1,6 @@
 {
   "name": "mineplex",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Wrapper for the Mineplex API",
   "main": "js/index.js",
   "types": "js/index.d.ts",

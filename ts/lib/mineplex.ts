@@ -4,6 +4,7 @@ import * as Promise from "bluebird";
 // Mineplex Libraries
 import * as player from "./player";
 import * as network from "./network";
+import * as amplifier from "./amplifier";
 
 export type Callback<T> = (err, res: T) => void;
 
@@ -23,6 +24,10 @@ export class APIError implements Error {
     this.message = base["message"] || base["error"];
   }
 }
+
+export interface Dictionary<T> {
+  [id: string]: T;
+};
 
 export class MineplexAPI {
   private baseUrl: string;
@@ -68,6 +73,22 @@ export class MineplexAPI {
 
   public getServerStatus(region: network.Region, server: string, callback?: Callback<network.MinecraftServer>) {
     return this.apiCall<network.MinecraftServer>(`network/${region}`, callback);
+  }
+
+  /**
+   * AMPLIFIER ENDPOINTS !
+   */
+
+  public getAmplifierGroups(callback?: Callback<Array<string>>) {
+    return this.apiCall<Array<String>>(`amplifierGroup`, callback);
+  }
+
+  public getAmplifiers(group: string, callback?: Callback<Array<amplifier.Amplifier>>) {
+    return this.apiCall<Array<amplifier.Amplifier>>(`amplifier/${group}`, callback);
+  }
+
+  public getAllAmplifiers(callback?: Callback<Dictionary<Array<amplifier.Amplifier>>>) {
+    return this.apiCall<Dictionary<Array<amplifier.Amplifier>>>(`amplifier`, callback);
   }
 
   /**

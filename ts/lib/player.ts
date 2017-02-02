@@ -30,6 +30,7 @@ export interface Status {
    * The current server the player is connected to. Only present if online
    * is true.
    * @type {string}
+   * @deprecated API no longer provides current server
    */
   server?: string;
 }
@@ -68,6 +69,18 @@ export interface Player extends PlayerBase {
   lastLogin: string;
 
   /**
+   * The number of gems that player has
+   * @type {number}
+   */
+  gems: number;
+
+  /**
+   * The number of shards that player has
+   * @type {number}
+   */
+  shards: number;
+
+  /**
    * The level of the player
    * @type {Level}
    */
@@ -86,7 +99,11 @@ export interface Player extends PlayerBase {
   friends: Array<PlayerBase>;
 
   /**
-   * Player stats
+   * Player stats. These values will not appear the same for all players. Currently
+   * stats are only shown if a player has recorded data for that stat, so more/less
+   * stats may show up for some players. The easiest way to work with this right now
+   * is to look at the data the API returns and build around it. If a stat doesn't
+   * exist for a player, assume it is zero.
    */
   stats: {};
 }
